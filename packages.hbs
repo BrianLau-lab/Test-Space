@@ -1,0 +1,112 @@
+﻿{{!-- OWNER: frontend-customer. Customer parcel list.
+     Variables from the route: packages, total, page, totalPages, pagination, filters, statuses.
+     This page is read-only: no edit, pickup, shelf, or exception buttons. --}}
+
+<div class="mb-4">
+  <span class="text-uppercase text-muted fw-bold small">Customer Portal</span>
+  <h1 class="h3 mb-0">My parcels</h1>
+</div>
+
+{{!-- Search form. Method GET, action /my/packages, fields q and status. --}}
+<form class="card border-0 shadow-sm mb-4" method="get" action="/my/packages" role="search" aria-label="Search my parcels">
+  <div class="card-body">
+    <div class="row g-3 align-items-end">
+      <div class="col-12 col-md-6">
+        <label class="form-label detail-label" for="q">Tracking number</label>
+        <input class="form-control" type="search" id="q" name="q" value="{{filters.q}}" placeholder="e.g. CAINIAO-HK-1002">
+      </div>
+      <div class="col-12 col-md-4">
+        <label class="form-label detail-label" for="status">Status</label>
+        <select class="form-select" id="status" name="status">
+          <option value="">All statuses</option>
+          {{#each statuses}}
+            <option value="{{this}}" {{selectedIf this ../filters.status}}>{{this}}</option>
+          {{/each}}
+        </select>
+      </div>
+      <div class="col-12 col-md-2 d-grid">
+        <button class="btn btn-primary" type="submit" style="min-height: 44px;">Search</button>
+      </div>
+    </div>
+  </div>
+</form>
+
+<p class="text-secondary" aria-live="polite">
+  {{total}} {{#if (eq total 1)}}parcel{{else}}parcels{{/if}} found
+</p>
+
+<section aria-label="Parcel list">
+  {{#each packages}}
+    <article class="card parcel-card border-0 shadow-sm mb-3">
+      <div class="card-body p-3 p-md-4">
+        <div class="row g-3 align-items-center">
+          <div class="col-12 col-md-7">
+            <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
+              <h2 class="h5 mb-0 text-break">{{trackingNo}}</h2>
+              <span class="badge text-bg-{{statusClass status}}">{{status}}</span>
+            </div>
+            <div class="row g-2">
+              <div class="col-4">
+                <div class="detail-label">Type</div>
+                <div class="detail-value">{{type}}</div>
+              </div>
+              <div class="col-4">
+                <div class="detail-label">Weight</div>
+                <div class="detail-value">{{weight}} kg</div>
+              </div>
+              <div class="col-4">
+                <div class="detail-label">Arrived</div>
+                <div class="detail-value">{{formatDateOnly arrivedAt}}</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-12 col-md-5">
+            <div class="d-flex flex-column flex-sm-row flex-md-column align-items-stretch align-items-md-end gap-3">
+              {{!-- A Notified parcel makes its code easy to find. Other statuses show the code
+                   quietly, or an em dash when none exists yet. --}}
+              {{#if (eq status "Notified")}}
+                <div class="pickup-code-panel text-center flex-grow-1 flex-md-grow-0">
+                  <div class="detail-label">Pickup code</div>
+                  <div class="pickup-code">{{#if pickupCode}}{{pickupCode}}{{else}}—{{/if}}</div>
+                </div>
+              {{else}}
+                <div class="text-md-end">
+                  <div class="detail-label">Pickup code</div>
+                  <div class="detail-value">{{#if pickupCode}}{{pickupCode}}{{else}}—{{/if}}</div>
+                </div>
+              {{/if}}
+              <a class="btn btn-outline-primary d-flex align-items-center justify-content-center" style="min-height: 44px;" href="/my/packages/{{id}}">
+                View details<span class="visually-hidden"> for parcel {{trackingNo}}</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </article>
+  {{else}}
+    <div class="card border-0 shadow-sm">
+      <div class="card-body text-center p-5">
+        <h2 class="h5">No parcels match the filters</h2>
+        <p class="text-secondary mb-3">Try a different tracking number or choose “All statuses”.</p>
+        <a class="btn btn-outline-primary" href="/my/packages">Clear filters</a>
+      </div>
+    </div>
+  {{/each}}
+</section>
+
+{{!-- Pagination: the server builds every url, so the view never assembles a query string.
+     pagination.[1] only exists when there are two or more pages. --}}
+{{#if pagination.[1]}}
+  <nav aria-label="Parcel pages" class="mt-4">
+    <ul class="pagination justify-content-center flex-wrap">
+      {{#each pagination}}
+        <li class="page-item {{#if active}}active{{/if}}">
+          <a class="page-link" href="{{url}}" {{#if active}}aria-current="page"{{/if}}>
+            <span class="visually-hidden">Page </span>{{number}}
+          </a>
+        </li>
+      {{/each}}
+    </ul>
+  </nav>
+{{/if}}

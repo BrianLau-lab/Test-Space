@@ -1,0 +1,83 @@
+﻿{{!-- OWNER: frontend-customer. Customer parcel detail.
+     Variables from the route: parcel, tracking (newest first, sorted by the route).
+     Read-only page: no edit or action controls. --}}
+
+<a class="d-inline-flex align-items-center mb-3" style="min-height: 44px;" href="/my/packages">&larr; Back to my parcels</a>
+
+<div class="d-flex flex-wrap align-items-center gap-2 mb-4">
+  <h1 class="h3 mb-0 text-break">{{parcel.trackingNo}}</h1>
+  <span class="badge text-bg-{{statusClass parcel.status}} fs-6">{{parcel.status}}</span>
+</div>
+
+{{!-- Large pickup-code panel, only when a code exists. --}}
+{{#if parcel.pickupCode}}
+  <section class="card border-0 shadow-sm mb-4" aria-labelledby="pickup-heading">
+    <div class="card-body p-3 p-md-4">
+      <h2 class="h6 detail-label mb-2" id="pickup-heading">Your pickup code</h2>
+      <div class="pickup-code-panel text-center d-block">
+        <div class="pickup-code" style="font-size: clamp(2rem, 11vw, 3rem);">{{parcel.pickupCode}}</div>
+      </div>
+      <p class="text-secondary small mt-2 mb-0">Show this code at the counter when you collect your parcel.</p>
+    </div>
+  </section>
+{{/if}}
+
+<section class="card border-0 shadow-sm mb-4" aria-labelledby="details-heading">
+  <div class="card-body p-3 p-md-4">
+    <h2 class="h5 mb-3" id="details-heading">Parcel details</h2>
+    <div class="row g-3">
+      <div class="col-6 col-md-4">
+        <div class="detail-label">Recipient</div>
+        <div class="detail-value">{{parcel.recipientName}}</div>
+      </div>
+      <div class="col-6 col-md-4">
+        <div class="detail-label">Type</div>
+        <div class="detail-value">{{parcel.type}}</div>
+      </div>
+      <div class="col-6 col-md-4">
+        <div class="detail-label">Weight</div>
+        <div class="detail-value">{{parcel.weight}} kg</div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="detail-label">Arrived</div>
+        <div class="detail-value">{{formatDate parcel.arrivedAt}}</div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="detail-label">Shelved</div>
+        <div class="detail-value">{{formatDate parcel.shelvedAt}}</div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="detail-label">Notified</div>
+        <div class="detail-value">{{formatDate parcel.notifiedAt}}</div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="detail-label">Picked up</div>
+        <div class="detail-value">{{formatDate parcel.pickedUpAt}}</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="card border-0 shadow-sm" aria-labelledby="timeline-heading">
+  <div class="card-body p-3 p-md-4">
+    <h2 class="h5 mb-3" id="timeline-heading">Tracking history</h2>
+    {{#if tracking}}
+      <ol class="timeline list-unstyled mb-0">
+        {{#each tracking}}
+          <li class="timeline-item">
+            <span class="timeline-dot bg-{{statusClass status}}" aria-hidden="true"></span>
+            <div class="min-w-0">
+              <div class="d-flex flex-wrap align-items-center gap-2">
+                <span class="badge text-bg-{{statusClass status}}">{{status}}</span>
+                <span class="text-secondary small">{{formatDate createdAt}}</span>
+              </div>
+              <p class="mb-0 mt-1 text-break">{{description}}</p>
+            </div>
+          </li>
+        {{/each}}
+      </ol>
+    {{else}}
+      <p class="text-secondary mb-0">No tracking events have been recorded for this parcel yet.</p>
+    {{/if}}
+  </div>
+</section>
